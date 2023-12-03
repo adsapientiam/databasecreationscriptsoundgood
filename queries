@@ -7,7 +7,7 @@ FROM lesson
 LEFT JOIN solo_lesson ON solo_lesson.lesson_id = lesson.lesson_id
 LEFT JOIN group_lesson ON group_lesson.lesson_id = lesson.lesson_id
 LEFT JOIN ensemble ON ensemble.lesson_id = lesson.lesson_id
-WHERE EXTRACT(YEAR FROM time_of_lesson) = '2024'
+WHERE EXTRACT(YEAR FROM time_of_lesson) = EXTRACT(YEAR FROM NOW())
 GROUP BY month
 ORDER BY month;
 
