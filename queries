@@ -1,1 +1,72 @@
+SELECT EXTRACT(MONTH FROM time_of_lesson) AS month,
+COUNT(lesson.lesson_id) AS total, 
+COUNT(solo_lesson.lesson_id) AS solo,
+COUNT(group_lesson.lesson_id) AS group,
+COUNT(ensemble.lesson_id) as ensemble
+FROM lesson
+LEFT JOIN solo_lesson ON solo_lesson.lesson_id = lesson.lesson_id
+LEFT JOIN group_lesson ON group_lesson.lesson_id = lesson.lesson_id
+LEFT JOIN ensemble ON ensemble.lesson_id = lesson.lesson_id
+WHERE EXTRACT(YEAR FROM time_of_lesson) = '2024'
+GROUP BY month
+ORDER BY month;
 
+SELECT COUNT(ss.sibling_id) AS no_of_siblings, COUNT(s.student_id) AS no_of_students
+	FROM student AS s
+	FULL JOIN student_sibling AS ss
+	ON ss.student_id = s.student_id
+	WHERE ss.sibling_id IS NULL
+
+	UNION ALL
+
+	SELECT no_of_siblings, COUNT(*) as no_of_students
+FROM (
+    SELECT COUNT(*) AS no_of_siblings
+    FROM (
+        SELECT student_id AS s_id FROM student_sibling
+
+        UNION ALL 
+
+        SELECT sibling_id AS s_id FROM student_sibling
+    )
+    GROUP BY s_id
+)
+GROUP BY no_of_siblings
+ORDER BY no_of_siblings;
+
+SELECT
+p.first_name,
+p.last_name,
+i.instructor_id,
+COUNT(*) AS no_of_lessons
+FROM instructor AS i, person AS p, lesson AS l
+WHERE i.instructor_id = l.instructor_id AND i.person_id = p.person_id AND
+EXTRACT(MONTH FROM time_of_lesson) = EXTRACT(MONTH FROM NOW())
+GROUP BY i.instructor_id, p.first_name, p.last_name
+HAVING COUNT(lesson_id) >  2
+ORDER BY no_of_lessons DESC
+
+SELECT
+CASE
+	WHEN (EXTRACT(DOW FROM time_of_lesson) = 0) THEN 'Monday'
+	WHEN (EXTRACT(DOW FROM time_of_lesson) = 1) THEN 'Tuesday'
+	WHEN (EXTRACT(DOW FROM time_of_lesson) = 2) THEN 'Wednesday'
+	WHEN (EXTRACT(DOW FROM time_of_lesson) = 3) THEN 'Thursday'
+	WHEN (EXTRACT(DOW FROM time_of_lesson) = 4) THEN 'Friday'
+	WHEN (EXTRACT(DOW FROM time_of_lesson) = 5) THEN 'Saturday'
+	WHEN (EXTRACT(DOW FROM time_of_lesson) = 6) THEN 'Sunday'
+END AS day,
+e.ensemble_genre,
+CASE
+	WHEN (CAST(e.ensemble_maximum AS INT) - COUNT(DISTINCT sl.student_id)) > 2 THEN 'Many Seats'
+	WHEN (CAST(e.ensemble_maximum AS INT) - COUNT(DISTINCT sl.student_id)) BETWEEN 1 AND 2 THEN '1 or 2 Seats'
+	WHEN (CAST(e.ensemble_maximum AS INT) - COUNT(DISTINCT sl.student_id)) < 1 THEN 'No Seats'
+END AS no_of_free_seats
+
+FROM ensemble AS e
+LEFT JOIN lesson AS l ON e.lesson_id = l.lesson_id
+LEFT JOIN student_lesson AS sl ON l.lesson_id = sl.lesson_id
+WHERE EXTRACT(WEEK FROM time_of_lesson) = EXTRACT(WEEK FROM NOW()) + 1
+
+GROUP BY l.lesson_id, e.ensemble_genre, CAST(e.ensemble_maximum AS INT)
+ORDER BY EXTRACT(DOW FROM time_of_lesson), e.ensemble_genre
