@@ -165,7 +165,7 @@ CREATE TABLE rental (
  time_of_rental TIMESTAMP(6) NOT NULL
 );
 
-ALTER TABLE rental ADD CONSTRAINT PK_rental PRIMARY KEY (instrument_id,student_id);
+ALTER TABLE rental ADD CONSTRAINT PK_rental PRIMARY KEY (instrument_id);
 
 
 CREATE TABLE solo_lesson (
