@@ -121,8 +121,7 @@ ALTER TABLE price_scheme ADD CONSTRAINT PK_price_scheme PRIMARY KEY (price_schem
 CREATE TABLE student (
  student_id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
  person_id INT NOT NULL,
- contact_person_id INT,
- rule_id INT NOT NULL
+ contact_person_id INT
 );
 
 ALTER TABLE student ADD CONSTRAINT PK_student PRIMARY KEY (student_id);
