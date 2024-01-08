@@ -1482,11 +1482,10 @@ VALUES
 ('499'),
 ('500');
 
-  INSERT INTO student (person_id, contact_person_id, rule_id)
+  INSERT INTO student (person_id, contact_person_id)
 SELECT
     generate_series(51, 495) AS person_id,
-    NULL AS contact_person_id,
-    3 AS rule_id;
+    NULL AS contact_person_id;
 
 INSERT INTO instrument (stock_id)
 VALUES
